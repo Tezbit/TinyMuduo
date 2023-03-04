@@ -113,6 +113,7 @@ void EventLoop::updateChannel(Channel *channel) {
     poller_->updateChannel(channel);
 }
 
+//只有acceptorChannel和wakeupChannel用
 void EventLoop::removeChannel(Channel *channel) {
     poller_->removeChannel(channel);
 }

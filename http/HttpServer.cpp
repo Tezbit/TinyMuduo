@@ -88,7 +88,7 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &req)
     httpCallback_(req, &response);
     Buffer buf;
     response.appendToBuffer(&buf);
-    // TODO:需要重载 TcpConnection::send 使其可以接收一个缓冲区
+
     conn->send(&buf);
     if (response.closeConnection()) {
         conn->shutdown();
