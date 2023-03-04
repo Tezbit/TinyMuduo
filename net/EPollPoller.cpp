@@ -70,6 +70,8 @@ void EPollPoller::updateChannel(Channel *channel) {
     } else { //Channel已经在Poller里注册了
         if (channel->isNoneEvent()) {
             //已经没有感兴趣的事件，所以从epoll移除，不再进行关注
+            //但没有进行erase彻底删除，因为走到这边有可能是线程的销毁，程序的结束也有可能是客户端断开连接
+            //不进行erase下次建立连接就不需要再添加到channels_里。是一种软删除的做法
             update(EPOLL_CTL_DEL, channel);
             channel->set_index(cDeleted);
         } else {
@@ -87,8 +89,7 @@ void EPollPoller::removeChannel(Channel *channel) {
     if (index == cAdded) {
         update(EPOLL_CTL_DEL, channel);
     }
-    //cDelete只是表明Channel目前没有感兴趣的事件，但不代表之后不会有，故并没有从ChannelMap里删除
-    //只有当调用removeChannel进行彻底移除Channel时，才会移除ChannelMap,所以这边设置index为cNew
+    //只有wackUpFd和acceptorfd被注销，也就是线程被销毁的时候才会调用这个
     channel->set_index(cNew);
 }
 
